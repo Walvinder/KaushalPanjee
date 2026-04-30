@@ -3736,6 +3736,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 			if (status != null && status.equals("Active") && !status.equals("null")) {
 				String aadhaarNumber = enc.decrypt(pass.getUserInput());
+				
+				if (AadhaarRateLimiter.isBlocked(aadhaarNumber)) {
+				    response.setResponseCode(429);
+				    response.setResponseDesc("Too many requests. Please try again after 10 seconds.");
+				    return response;
+				}
+				
 				String encAadhaarNumber = enc.encryptNew(aadhaarNumber);
 
 				boolean aadhaarFlag = adhaarRepo.isAadhaarExistOrNot(encAadhaarNumber);
